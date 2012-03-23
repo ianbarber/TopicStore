@@ -7,9 +7,7 @@
 
 // Should probably do this with a macro to be more C-like
 void handler_nullcheck (char *string, int length) {
-	if( string[length] != '\0' ) {
-		string[length] = '\0';
-	}
+	string[length] = '\0';
 }
 
 handler_t *handler_init () {

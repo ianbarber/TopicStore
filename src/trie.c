@@ -9,6 +9,7 @@
 // TODO: FS sync?
 // TODO: delete 
 // TODO: Compact trie?
+// TODO: add a counter of nodes or similar to estimate tree size
 
 trienode_t *trie_init () {
 	trienode_t *trie;
