@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	while (1) {
 		memset (header, 0, TOPS_MAX_HEADER_SIZE);
 		zmq_recv (socket, header, TOPS_MAX_HEADER_SIZE, 0);
-		printf("DEBUG: %s\n", header);
+		//printf("DEBUG: %s\n", header);
 		
 		if (strcmp (header, TOPS_ADD) == 0) {
 			rc = handler_add (handler, socket, pub);

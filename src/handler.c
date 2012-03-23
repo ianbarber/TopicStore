@@ -78,11 +78,8 @@ int handler_get (handler_t *handler, void *socket) {
 		rc = zmq_send (socket, dsns->dsn, strlen(dsns->dsn), ZMQ_SNDMORE);
 		last = dsns;
 		dsns = dsns->next;
-		// TODO: remove these frees? Should be part of the structure the tree manages
-		free(last);
 	}
 	rc = zmq_send (socket, dsns->dsn, strlen(dsns->dsn), 0);
-	free(dsns);
 	
 	return 0;
 }

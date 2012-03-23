@@ -82,7 +82,7 @@ tops_topic_msg *trie_get_dsns (trienode_t *trie, char *topic) {
 	index = 0;
 	curtrie = trie;
 	
-	while (topic[index] != '\0') {
+	while (index < TOPS_MAX_TOPIC_SIZE) {
 		if (curtrie->children == NULL) {
 			curtrie = NULL;
 			break;
@@ -100,6 +100,11 @@ tops_topic_msg *trie_get_dsns (trienode_t *trie, char *topic) {
 		
 		if( curtrie->key != topic[index] ) {
 			curtrie = NULL;
+			break;
+		}
+		
+		// If we're on the string terminator, exit 
+		if (topic[index] == '\0' ) {
 			break;
 		}
 		
