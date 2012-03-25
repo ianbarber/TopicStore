@@ -14,6 +14,7 @@
 #define TOPS_REM "TOPS01_REM"
 #define TOPS_GET "TOPS01_GET"
 #define TOPS_TOP "TOPS01_TOP"
+#define TOPS_UPD "TOPS01_UPD"
 #define TOPS_WAT "TOPS01_WAT"
 
 typedef struct {

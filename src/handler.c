@@ -39,17 +39,23 @@ int handler_add (handler_t *handler, void *socket, void *pub) {
 	handler_nullcheck(expirystring, len);
 	
 	size = sizeof(int);
-	rc = zmq_send (pub, topic, strlen(topic), ZMQ_SNDMORE);
 	
 	// TODO: error checking
 	// TODO: Handle invalid number of message parts better.
 	zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &size);
+	
+	if(more == 1) {
+		rc = zmq_send (pub, TOPS_UPD, strlen(TOPS_UPD), ZMQ_SNDMORE);
+		rc = zmq_send (pub, topic, strlen(topic), ZMQ_SNDMORE);
+		rc = zmq_send (pub, type, strlen(type), ZMQ_SNDMORE);
+	}
+	
 	while ( more == 1 ) {
 		len = zmq_recv (socket, dsn, TOPS_MAX_DSN_SIZE, 0);
 		handler_nullcheck(dsn, len);
 		zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &size);
-		rc = zmq_send (pub, topic, strlen(topic), more == 1 ? ZMQ_SNDMORE : 0);
 		rc = trie_add_dsn (handler->trieroot, topic, type, dsn, expiry);
+		rc = zmq_send (pub, dsn, strlen(dsn), more == 1 ? ZMQ_SNDMORE : 0);
 	}
 	
 	// TODO: Modify expiry time by maximum server value rather than just client

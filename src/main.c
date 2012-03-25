@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	socket = zmq_socket (ctx, ZMQ_REP);
 	rc = zmq_bind (socket, "tcp://*:9292");
 	pub = zmq_socket (ctx, ZMQ_PUB);
-	rc = zmq_bind  (socket, "tcp://*9293");
+	rc = zmq_bind  (pub, "tcp://*:9293");
 	handler = handler_init ();
 	
 	while (1) {
