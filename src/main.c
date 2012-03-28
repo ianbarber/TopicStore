@@ -10,6 +10,7 @@
 // TODO: Error output
 // TODO: Max store size?
 // TODO: Disk persistence for store?
+// TODO: Flush any extraneous message parts that aren't expected
 
 int main(int argc, char *argv[])
 {

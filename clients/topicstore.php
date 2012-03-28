@@ -11,11 +11,11 @@ $sub->setSockOpt(ZMQ::SOCKOPT_SUBSCRIBE, "");
 sleep(1);
 $socket->sendMulti(array("TOPS01_ADD", "PUB", "test", time()+(24*60*60), "ipc://test", "ipc://test2"));
 var_dump($socket->recvMulti());
-
 var_dump($sub->recvMulti());
 
-// $socket->sendMulti(array("TOPS01_GET", "test"));
-// var_dump($socket->recvMulti());
+$socket->sendMulti(array("TOPS01_GET", "test"));
+var_dump($socket->recvMulti());
+
 // $socket->sendMulti(array("TOPS01_ADD", "PUB", "test", time()+(24*60*60), "ipc://test", "ipc://test2"));
 // var_dump($socket->recvMulti());
 // $socket->sendMulti(array("TOPS01_GET", "test"));
