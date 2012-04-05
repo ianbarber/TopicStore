@@ -34,6 +34,45 @@ tops_topic_msg *trie_expire_values (tops_topic_msg *value) {
 	return root;
 }
 
+trienode_t *trie_find_node (trienode_t *trie, char *topic) {
+	trienode_t *curtrie;
+	int index;
+	
+	index = 0;
+	curtrie = trie;
+	
+	while (index < TOPS_MAX_TOPIC_SIZE) {
+		if (curtrie->children == NULL) {
+			curtrie = NULL;
+			break;
+		}
+		
+		curtrie = curtrie->children;
+		
+		while ( curtrie->next != NULL ) {
+			if (curtrie->key == topic[index]) {
+				break;
+			} else {
+				curtrie = curtrie->next;
+			}
+		}
+		
+		if( curtrie->key != topic[index] ) {
+			curtrie = NULL;
+			break;
+		}
+		
+		index++;
+		
+		/* If we're on the string terminator, exit */
+		if (topic[index] == '\0' ) {
+			break;
+		}
+	}
+	
+	return curtrie;
+}
+
 
 /* Copy a selection of nodes into new memory for returning */
 tops_topic_msg *trie_walk_values (trienode_t *trie) {
@@ -148,40 +187,9 @@ int trie_add_dsn (trienode_t *trie, char *topic, char *type, char *dsn, time_t e
 tops_topic_msg *trie_get_dsns (trienode_t *trie, char *topic) {
 	trienode_t *curtrie;
 	tops_topic_msg *retval;
-	int index;
-	
-	index = 0;
-	curtrie = trie;
+
 	retval = NULL;
-	
-	while (index < TOPS_MAX_TOPIC_SIZE) {
-		if (curtrie->children == NULL) {
-			curtrie = NULL;
-			break;
-		}
-		
-		curtrie = curtrie->children;
-		
-		while ( curtrie->next != NULL ) {
-			if (curtrie->key == topic[index]) {
-				break;
-			} else {
-				curtrie = curtrie->next;
-			}
-		}
-		
-		if( curtrie->key != topic[index] ) {
-			curtrie = NULL;
-			break;
-		}
-		
-		index++;
-		
-		/* If we're on the string terminator, exit */
-		if (topic[index] == '\0' ) {
-			break;
-		}
-	}
+	curtrie = trie_find_node (trie, topic);
 	
 	if (curtrie != NULL) {
 		/* 
@@ -193,6 +201,32 @@ tops_topic_msg *trie_get_dsns (trienode_t *trie, char *topic) {
 	}
 	
 	return retval;
+}
+
+int trie_rem_dsn (trienode_t *trie, char *topic, char *dsn) {
+	trienode_t *curtrie;
+	tops_topic_msg *tmsg, *previous;
+	int rc = 0; 
+	
+	curtrie = trie_find_node (trie, topic);
+	
+	if (curtrie != NULL && curtrie->value) {
+		/* Walk the list of values */
+		tmsg = curtrie->value;
+		do {
+			if ( strcmp(tmsg->dsn, dsn) == 0 ) {
+				if (previous) {
+					previous->next = tmsg->next;
+				} else {
+					curtrie->value = tmsg->next;
+				}
+			}
+
+			previous = tmsg;
+		} while (tmsg->next != NULL && (tmsg = tmsg->next));
+	}
+	
+	return rc;
 }
 
 tops_topic_msg *trie_build_record (char *type, char *dsn, time_t expiry) {

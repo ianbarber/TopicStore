@@ -13,6 +13,7 @@ typedef struct trienode {
 trienode_t *trie_init ();
 int trie_add_dsn (trienode_t *trie, char *topic, char *type, char *dsn, time_t expiry);
 tops_topic_msg *trie_get_dsns (trienode_t *trie, char *topic);
+int trie_rem_dsn (trienode_t *trie, char *topic, char *dsn);
 tops_topic_msg *trie_build_record (char *type, char *dsn, time_t expiry);
 
 #endif

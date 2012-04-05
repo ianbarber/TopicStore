@@ -5,7 +5,6 @@
 #include "trie.h"
 #include "handler.h"
 
-// Should probably do this with a macro to be more C-like
 void handler_nullcheck (char *string, int length) {
 	string[length] = '\0';
 }
@@ -17,9 +16,9 @@ handler_t *handler_init () {
 	return handler;
 }
 
-// TODO: Add error handling
+/* TODO: Add error handling */
 int handler_add (handler_t *handler, void *socket, void *pub) {
-	// TODO: Document size limit in spec
+	/* TODO: Document size limit in spec */
 	int rc, more, len;
 	size_t size;
 	time_t expiry;
@@ -28,20 +27,20 @@ int handler_add (handler_t *handler, void *socket, void *pub) {
 	char dsn [TOPS_MAX_DSN_SIZE];
 	char expirystring [TOPS_MAX_EXPIRY_SIZE];
 	
-	// TODO: Check multipart flag!
-	// TODO: Check sizes
+	/* TODO: Check multipart flag! */
+	/* TODO: Check sizes */
 	len = zmq_recv (socket, type, TOPS_MAX_TYPE_SIZE, 0);
 	handler_nullcheck(type, len);
 	len = zmq_recv (socket, topic, TOPS_MAX_TOPIC_SIZE, 0);
 	handler_nullcheck(topic, len);
-	// TODO: should this be the time in bytes rather than chars?
+	/* TODO: should this be the time in bytes rather than chars? */
 	len = zmq_recv (socket, expirystring, TOPS_MAX_EXPIRY_SIZE, 0);
 	handler_nullcheck(expirystring, len);
 	
 	size = sizeof(int);
 	
-	// TODO: error checking
-	// TODO: Handle invalid number of message parts better.
+	/* TODO: error checking */
+	/* TODO: Handle invalid number of message parts better. */
 	zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &size);
 	
 	if(more == 1) {
@@ -58,7 +57,7 @@ int handler_add (handler_t *handler, void *socket, void *pub) {
 		rc = zmq_send (pub, dsn, strlen(dsn), more == 1 ? ZMQ_SNDMORE : 0);
 	}
 	
-	// TODO: Modify expiry time by maximum server value rather than just client
+	/* TODO: Modify expiry time by maximum server value rather than just client */
 	rc = zmq_send (socket, TOPS_OK, strlen(TOPS_OK), ZMQ_SNDMORE);
 	rc = zmq_send (socket, expirystring, strlen(expirystring), 0);
 	
@@ -76,7 +75,7 @@ int handler_get (handler_t *handler, void *socket) {
 	
 	rc = zmq_send (socket, TOPS_TOP, strlen(TOPS_TOP), dsns == NULL ? 0 : ZMQ_SNDMORE );
 	if (dsns == NULL) {
-		return 0; // not found
+		return 0; /* not found */
 	}
 	
 	rc = zmq_send (socket, dsns->type, strlen(dsns->type), ZMQ_SNDMORE);
@@ -92,9 +91,27 @@ int handler_get (handler_t *handler, void *socket) {
 	return 0;
 }
 
-
-// TODO: remove!
 int handler_rem (handler_t *handler, void *socket) {
+	int rc, len, more;
+	size_t size;
+	char topic [TOPS_MAX_TOPIC_SIZE];
+	char dsn [TOPS_MAX_DSN_SIZE];
+	
+	/* TODO: Check multipart flag! */
+	/* TODO: Check sizes */
+	len = zmq_recv (socket, topic, TOPS_MAX_TOPIC_SIZE, 0);
+	handler_nullcheck(topic, len);	
+	
+	while ( zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &size) == 0 && more == 1 ) {
+		rc = zmq_recv (socket, dsn, TOPS_MAX_DSN_SIZE, 0);
+		rc = trie_rem_dsn (handler->trieroot, topic, dsn);
+		if (rc != 0) {
+			/* TODO: How do we handle error? */
+		}
+	}
+	
+	rc = zmq_send (socket, TOPS_OK, strlen(TOPS_OK), 0);
+	
 	return 0;
 }
 
@@ -103,12 +120,12 @@ int handler_unknown (handler_t *handler, void *socket) {
 	size_t size;
 	char topic [TOPS_MAX_TOPIC_SIZE];
 	
-	// Drain all message parts
+	/* Drain all message parts */
 	while ( zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &size) == 0 && more == 1 ) {
 		rc = zmq_recv (socket, topic, TOPS_MAX_TOPIC_SIZE, 0);
 	}
 	
-	// Send unknown message response
+	/* Send unknown message response */
 	return zmq_send (socket, TOPS_WAT, strlen(TOPS_WAT), 0);
 }
 
