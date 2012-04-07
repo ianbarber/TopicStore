@@ -103,7 +103,8 @@ int handler_rem (handler_t *handler, void *socket) {
 	handler_nullcheck(topic, len);	
 	
 	while ( zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &size) == 0 && more == 1 ) {
-		rc = zmq_recv (socket, dsn, TOPS_MAX_DSN_SIZE, 0);
+		len = zmq_recv (socket, dsn, TOPS_MAX_DSN_SIZE, 0);
+		handler_nullcheck(dsn, len);	
 		rc = trie_rem_dsn (handler->trieroot, topic, dsn);
 		if (rc != 0) {
 			/* TODO: How do we handle error? */

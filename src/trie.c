@@ -207,8 +207,15 @@ int trie_rem_dsn (trienode_t *trie, char *topic, char *dsn) {
 	trienode_t *curtrie;
 	tops_topic_msg *tmsg, *previous;
 	int rc = 0; 
+	previous = NULL;
 	
 	curtrie = trie_find_node (trie, topic);
+	
+	curtrie = curtrie->children;
+	
+	while(curtrie != NULL && curtrie->key != '\0') {
+		curtrie = curtrie->next;
+	}
 	
 	if (curtrie != NULL && curtrie->value) {
 		/* Walk the list of values */
