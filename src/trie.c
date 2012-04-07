@@ -173,11 +173,20 @@ int trie_add_dsn (trienode_t *trie, char *topic, char *type, char *dsn, time_t e
 		/* If there is no record here, we can just insert one */
 		curtrie->value = tmsg;
 	} else {
-		/* Iterate over the list of values, insert at end */
+		/* Iterate over the list of values, insert at end
+		unless the item is already there - if so just update the 
+		expiry time and leave it at that  */
+		
 		tempmsg = curtrie->value;
-		while( tempmsg->next != NULL ) {
-			tempmsg = tempmsg->next;
-		}
+		do {
+			if (strcmp (tempmsg->dsn, tmsg->dsn) == 0 ) {
+				tempmsg->expiry = tmsg->expiry;
+				free (tmsg);
+				/* Update expiry, return now */
+				return 0;
+			}
+		} while( tempmsg->next != NULL );
+		
 		tempmsg->next = tmsg;
 	}
 	
@@ -221,7 +230,7 @@ int trie_rem_dsn (trienode_t *trie, char *topic, char *dsn) {
 		/* Walk the list of values */
 		tmsg = curtrie->value;
 		do {
-			if ( strcmp(tmsg->dsn, dsn) == 0 ) {
+			if ( strcmp (tmsg->dsn, dsn) == 0 ) {
 				if (previous) {
 					previous->next = tmsg->next;
 				} else {
