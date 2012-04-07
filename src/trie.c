@@ -6,10 +6,10 @@
 #include "topicstore.h"
 #include "trie.h"
 
-// TODO: FS sync?
-// TODO: delete 
-// TODO: Compact trie?
-// TODO: add a counter of nodes or similar to estimate tree size
+/* 
+	TODO: Compact trie?
+	TODO: add a counter of nodes or similar to estimate tree size
+*/
 
 tops_topic_msg *trie_expire_values (tops_topic_msg *value) {
 	tops_topic_msg *root, *prev, *next;
@@ -160,7 +160,7 @@ int trie_add_dsn (trienode_t *trie, char *topic, char *type, char *dsn, time_t e
 			curtrie = curtrie->next;
 		}
 		
-		// If we're on the string terminator, exit 
+		/* If we're on the string terminator, exit */
 		if (topic[index] == '\0' ) {
 			break;
 		}
@@ -168,12 +168,12 @@ int trie_add_dsn (trienode_t *trie, char *topic, char *type, char *dsn, time_t e
 		index++;
 	}
 	
-	// We should now be at a null entry for a topic with a value.
+	/* We should now be at a null entry for a topic with a value. */
 	if(curtrie->value == NULL) {
-		// If there is no record here, we can just insert one
+		/* If there is no record here, we can just insert one */
 		curtrie->value = tmsg;
 	} else {
-		// Iterate over the list of values, insert 
+		/* Iterate over the list of values, insert at end */
 		tempmsg = curtrie->value;
 		while( tempmsg->next != NULL ) {
 			tempmsg = tempmsg->next;

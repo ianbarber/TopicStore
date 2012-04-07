@@ -131,6 +131,6 @@ int handler_unknown (handler_t *handler, void *socket) {
 }
 
 void handler_close (handler_t *handler) {
-	// TODO: shut down the trie 
+	/* TODO: shut down the trie */
 	return;
 }
